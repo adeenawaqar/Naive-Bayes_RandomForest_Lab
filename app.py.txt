@@ -1,0 +1,28 @@
+import streamlit as st
+import pickle
+import numpy as np
+
+model = pickle.load(open('titanic_model.pkl', 'rb'))
+
+st.title("🚢 Titanic Survival Prediction")
+
+p_class = st.selectbox("Ticket Class", [1, 2, 3])
+gender = st.radio("Gender", ["male", "female"])
+age = st.number_input("Age", min_value=1, max_value=100, value=25)
+sib = st.number_input("Siblings/Spouses", value=0)
+par = st.number_input("Parents/Children", value=0)
+fare = st.number_input("Fare", value=30.0)
+gate = st.selectbox("Port", ["S", "C", "Q"])
+
+g_val = 0 if gender == "male" else 1
+port_map = {"S": 0, "C": 1, "Q": 2}
+p_val = port_map[gate]
+
+if st.button("Predict"):
+    features = np.array([[p_class, g_val, age, sib, par, fare, p_val]])
+    res = model.predict(features)
+    
+    if res[0] == 1:
+        st.success("Result: Survived")
+    else:
+        st.error("Result: Not Survived")
